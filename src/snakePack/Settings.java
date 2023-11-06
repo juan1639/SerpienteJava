@@ -24,14 +24,17 @@ public class Settings {
 
     // ------------------------------------------------
     public static int longitudSnake = INICIAL_LONGITUD_SNAKE;
-    public static int marcador;
 
+    public static int marcador = 0;
+    public static int hiScore = 27;
+
+    public static int contador_optionPane = 9;
 
     // ================================================
     public class Controles {
 
     	public static Boolean izquierda = false;
-	    public static Boolean derecha = true;
+	    public static Boolean derecha = false;
 	    public static Boolean arriba = false;
 	    public static Boolean abajo = false;
     }
@@ -39,8 +42,8 @@ public class Settings {
     // ================================================
     public class Estado {
 
-    	public static Boolean preJuego = false;
-    	public static Boolean enJuego = true;
+    	public static Boolean preJuego = true;
+    	public static Boolean enJuego = false;
     	public static Boolean gameOver = false;
     }
 }

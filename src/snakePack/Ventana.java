@@ -2,8 +2,6 @@ package snakePack;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 
@@ -12,12 +10,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 // ===============================================================
 public class Ventana extends JPanel implements ActionListener {
 
+    private int newGame;
+    private int game_over_pane;
+
+    private Marcadores marcador;
+    private Marcadores hi;
     private SegmentoSnake[] segmento_snake = new SegmentoSnake[Settings.MAX_LONGITUD_SNAKE];
     private Manzana manzana;
 
@@ -43,6 +47,9 @@ public class Ventana extends JPanel implements ActionListener {
 
     private void comenzar() {
 
+        marcador = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 20), (int) (Settings.TILE_Y / 1.1), "Score: ");
+        hi = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 1.6), (int) (Settings.TILE_Y / 1.1), "Record: ");
+
         segmento_snake[0] = new SegmentoSnake(Settings.X_INI_SNAKE, Settings.Y_INI_SNAKE, Settings.TILE_X, Settings.TILE_Y);
 
         manzana = new Manzana(Settings.COLUMNAS, Settings.FILAS, Settings.TILE_X, Settings.TILE_Y);
@@ -60,13 +67,15 @@ public class Ventana extends JPanel implements ActionListener {
     
     private void renderiza(Graphics g) {
         
-        if (Settings.Estado.enJuego) {
+        if (Settings.Estado.enJuego || Settings.Estado.preJuego || Settings.Estado.gameOver) {
 
             for (int i = 0; i < Settings.FILAS; i ++) {
                 for (int ii = 0; ii < Settings.COLUMNAS; ii ++) {
 
-                    g.setColor(Color.white);
-                    g.drawRect(ii * Settings.TILE_X, i * Settings.TILE_Y, Settings.TILE_X, Settings.TILE_Y);
+                    if (i > 0) {
+                        g.setColor(Color.white);
+                        g.drawRect(ii * Settings.TILE_X, i * Settings.TILE_Y, Settings.TILE_X, Settings.TILE_Y);
+                    }
                 }
             }
 
@@ -76,45 +85,73 @@ public class Ventana extends JPanel implements ActionListener {
                 segmento_snake[i].dibuja(g, Settings.colorSnake);
             }
 
-            //textos((int) (resX / 20), "Score: " + marcador, 3, g);
+            marcador.dibuja(g, Settings.marcador);
+            hi.dibuja(g, Settings.hiScore);
 
             Toolkit.getDefaultToolkit().sync();
-
-        } else {
-
-            //gameOver(g);
-        }        
+        }      
     }
 
-    // private void gameOver(Graphics g) {
+    private void pre_juegoDialog() {
 
-    //     textos((int) (resX / 10), "Game Over", 1, g);
-    //     textos((int) (resX / 30), "Pulse SPACE para jugar otra partida...", 2, g);
-    // }
+        if (Settings.contador_optionPane <= 0) {
+            return;
+        }
 
-    // private void textos(int size, String texto, int idTxt, Graphics g) {
+        Settings.contador_optionPane --;
 
-    //     int fontSize = size;
-    //     String msg = texto;
+        if (Settings.Estado.preJuego) {
 
-    //     Font fuente = new Font("Helvetica", Font.BOLD, fontSize);
-    //     FontMetrics metr = getFontMetrics(fuente);
+            if (Settings.contador_optionPane == 0) {
 
-    //     g.setFont(fuente);
+                newGame = JOptionPane.showConfirmDialog(this, "Comenzar nueva partida...", "COMENZAR", JOptionPane.CLOSED_OPTION);
 
-    //     if (idTxt == 1) {
-    //         g.setColor(Color.orange);
-    //         g.drawString(msg, (resX - metr.stringWidth(msg)) / 2, resY / 2);
+                if (newGame == JOptionPane.OK_OPTION) {
 
-    //     } else if (idTxt == 2) {
-    //         g.setColor(Color.white);
-    //         g.drawString(msg, (resX - metr.stringWidth(msg)) / 2, (int) (resY / 1.2));
+                    Settings.Estado.enJuego = true;
+                    Settings.Estado.preJuego = false;
+                    Toolkit.getDefaultToolkit().beep();
+                }
+            }
 
-    //     } else if (idTxt == 3) {
-    //         g.setColor(Color.yellow);
-    //         g.drawString(msg, (resX - metr.stringWidth(msg)) / 2, 30);
-    //     }
-    // }
+        } else if (Settings.Estado.gameOver) {
+
+            if (Settings.contador_optionPane == 0) {
+
+                game_over_pane = JOptionPane.showConfirmDialog(this, "Volver a jugar?");
+
+                if (game_over_pane == JOptionPane.NO_OPTION || game_over_pane == JOptionPane.CANCEL_OPTION) {
+
+                    Toolkit.getDefaultToolkit().beep();
+                    System.exit(0);
+
+                } else if (game_over_pane == JOptionPane.YES_OPTION) {
+
+                    reset_rejugar();
+                }
+            }
+        }
+    }
+
+    private void reset_rejugar() {
+
+        Settings.longitudSnake = Settings.INICIAL_LONGITUD_SNAKE;
+        Settings.marcador = 0;
+
+        Settings.Controles.izquierda = false;
+        Settings.Controles.derecha = false;
+        Settings.Controles.arriba = false;
+        Settings.Controles.abajo = false;
+
+        Settings.Estado.enJuego = true;
+        Settings.Estado.gameOver = false;
+
+        segmento_snake[0] = new SegmentoSnake(Settings.X_INI_SNAKE, Settings.Y_INI_SNAKE, Settings.TILE_X, Settings.TILE_Y);
+
+        manzana = new Manzana(Settings.COLUMNAS, Settings.FILAS, Settings.TILE_X, Settings.TILE_Y);
+
+        Toolkit.getDefaultToolkit().beep();
+    }
 
     private void check_colisionManzana() {
 
@@ -122,7 +159,6 @@ public class Ventana extends JPanel implements ActionListener {
 
             Settings.longitudSnake ++;
             Settings.marcador ++;
-            Toolkit.getDefaultToolkit().beep();
 
             manzana = new Manzana(Settings.COLUMNAS, Settings.FILAS, Settings.TILE_X, Settings.TILE_Y);
             segmento_snake[Settings.longitudSnake - 1] = new SegmentoSnake(Settings.X_INI_SNAKE, Settings.Y_INI_SNAKE, Settings.TILE_X, Settings.TILE_Y);
@@ -173,7 +209,7 @@ public class Ventana extends JPanel implements ActionListener {
 
         SegmentoSnake cabeza = segmento_snake[0];
 
-        if (cabeza.y >= Settings.FILAS || cabeza.y < 0 || cabeza.x >= Settings.COLUMNAS || cabeza.x < 0) {
+        if (cabeza.y >= Settings.FILAS || cabeza.y < 1 || cabeza.x >= Settings.COLUMNAS || cabeza.x < 0) {
             return true;
         }
 
@@ -183,6 +219,8 @@ public class Ventana extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        pre_juegoDialog();
+
         if (Settings.Estado.enJuego) {
 
             check_colisionManzana();
@@ -191,8 +229,10 @@ public class Ventana extends JPanel implements ActionListener {
             if (check_autoColision() || check_limites()) {
 
                 Settings.Estado.enJuego = false;
+                Settings.Estado.gameOver = true;
+                Settings.hiScore = Marcadores.check_nuevoRecord(Settings.marcador, Settings.hiScore);
                 Toolkit.getDefaultToolkit().beep();
-                System.exit(0);
+                Settings.contador_optionPane = 9;
             }
         }
 

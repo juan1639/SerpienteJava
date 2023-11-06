@@ -22,7 +22,8 @@ public class Manzana {
 		this.alto = alto;
 
 		this.x = (int) (Math.random() * columnas);
-		this.y = (int) (Math.random() * filas);
+		this.y = (int) (Math.random() * (filas - 1));
+		this.y += 1;
 	}
 
 	public void dibuja(Graphics g, int[] rgb) {
