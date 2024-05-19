@@ -1,6 +1,5 @@
 package snakePack;
 
-// ===============================================================
 public class Settings {
 
 	public static final int RES_X = 600;
@@ -18,11 +17,15 @@ public class Settings {
     public static final int X_INI_SNAKE = (int) (COLUMNAS / 2);
     public static final int Y_INI_SNAKE = (int) (FILAS / 2);
 
-    public static final int[] colorFondo = {80, 160, 9};
-    public static final int[] colorManzana = {220, 30, 9};
+    //public static final int[] colorFondo = {80, 160, 9};
+    public static final int[] colorBlanco = {247, 247, 247};
+    public static final int[] colorFondo = {28, 143, 61};
+    public static final int[] colorCuadriculaBorde = {120, 250, 9};
+    public static final int[] colorManzana = {210, 40, 19};
     public static final int[] colorSnake = {170, 240, 9};
-
-    // ------------------------------------------------
+    public static final int[] colorScore = {245, 235, 9};
+    public static final int[] colorRecord = {245, 150, 9};
+    
     public static int longitudSnake = INICIAL_LONGITUD_SNAKE;
 
     public static int marcador = 0;

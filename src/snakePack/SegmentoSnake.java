@@ -3,7 +3,6 @@ package snakePack;
 import java.awt.Color;
 import java.awt.Graphics;
 
-// ===============================================================
 public class SegmentoSnake {
 
 	public int x;
@@ -24,7 +23,7 @@ public class SegmentoSnake {
 		int x = this.x * this.ancho;
 		int y = this.y * this.alto;
 
-		g.setColor(Color.orange);
+		g.setColor(new Color(rgb[0], rgb[1], rgb[2]));
 		g.fillRect(x, y, this.ancho, this.alto);
 	}
 }

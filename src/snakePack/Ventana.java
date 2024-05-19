@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-// ===============================================================
 public class Ventana extends JPanel implements ActionListener {
 
     private int newGame;
@@ -27,7 +26,6 @@ public class Ventana extends JPanel implements ActionListener {
 
     private Timer timer;
 
-    // --------------------------------------------------
     public Ventana() {
         
         inicializa();
@@ -47,8 +45,11 @@ public class Ventana extends JPanel implements ActionListener {
 
     private void comenzar() {
 
-        marcador = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 20), (int) (Settings.TILE_Y / 1.1), "Score: ");
-        hi = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 1.6), (int) (Settings.TILE_Y / 1.1), "Record: ");
+        marcador = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 20),
+        		(int) (Settings.TILE_Y / 1.1), "Score: ", Settings.colorScore);
+        
+        hi = new Marcadores(Settings.TILE_Y, (int) (Settings.RES_X / 1.6),
+        		(int) (Settings.TILE_Y / 1.1), "Record: ", Settings.colorRecord);
 
         segmento_snake[0] = new SegmentoSnake(Settings.X_INI_SNAKE, Settings.Y_INI_SNAKE, Settings.TILE_X, Settings.TILE_Y);
 
@@ -73,7 +74,9 @@ public class Ventana extends JPanel implements ActionListener {
                 for (int ii = 0; ii < Settings.COLUMNAS; ii ++) {
 
                     if (i > 0) {
-                        g.setColor(Color.white);
+                    	
+                    	int[] rgb = Settings.colorCuadriculaBorde;
+                        g.setColor(new Color(rgb[0], rgb[1], rgb[2]));
                         g.drawRect(ii * Settings.TILE_X, i * Settings.TILE_Y, Settings.TILE_X, Settings.TILE_Y);
                     }
                 }
@@ -138,11 +141,7 @@ public class Ventana extends JPanel implements ActionListener {
         Settings.longitudSnake = Settings.INICIAL_LONGITUD_SNAKE;
         Settings.marcador = 0;
 
-        Settings.Controles.izquierda = false;
-        Settings.Controles.derecha = false;
-        Settings.Controles.arriba = false;
-        Settings.Controles.abajo = false;
-
+        reset_false_directions();
         Settings.Estado.enJuego = true;
         Settings.Estado.gameOver = false;
 
@@ -152,7 +151,7 @@ public class Ventana extends JPanel implements ActionListener {
 
         Toolkit.getDefaultToolkit().beep();
     }
-
+    
     private void check_colisionManzana() {
 
         if (segmento_snake[0].x == manzana.getX() && segmento_snake[0].y == manzana.getY()) {
@@ -172,7 +171,6 @@ public class Ventana extends JPanel implements ActionListener {
             segmento_snake[i].y = segmento_snake[(i - 1)].y;
         }
 
-        // -------------------------------------
         if (Settings.Controles.izquierda) {
             segmento_snake[0].x --;
         }
@@ -238,6 +236,13 @@ public class Ventana extends JPanel implements ActionListener {
 
         repaint();
     }
+    
+    public void reset_false_directions() {
+		Settings.Controles.izquierda = false;
+        Settings.Controles.derecha = false;
+        Settings.Controles.arriba = false;
+        Settings.Controles.abajo = false;
+	}
 
     private class TAdapter extends KeyAdapter {
 
@@ -249,27 +254,23 @@ public class Ventana extends JPanel implements ActionListener {
             if (Settings.Estado.enJuego) {
 
                 if ((key == KeyEvent.VK_LEFT) && (!Settings.Controles.derecha)) {
+                	reset_false_directions();
                     Settings.Controles.izquierda = true;
-                    Settings.Controles.arriba = false;
-                    Settings.Controles.abajo = false;
                 }
 
                 if ((key == KeyEvent.VK_RIGHT) && (!Settings.Controles.izquierda)) {
+                	reset_false_directions();
                     Settings.Controles.derecha = true;
-                    Settings.Controles.arriba = false;
-                    Settings.Controles.abajo = false;
                 }
 
                 if ((key == KeyEvent.VK_UP) && (!Settings.Controles.abajo)) {
+                	reset_false_directions();
                     Settings.Controles.arriba = true;
-                    Settings.Controles.derecha = false;
-                    Settings.Controles.izquierda = false;
                 }
 
                 if ((key == KeyEvent.VK_DOWN) && (!Settings.Controles.arriba)) {
+                	reset_false_directions();
                     Settings.Controles.abajo = true;
-                    Settings.Controles.derecha = false;
-                    Settings.Controles.izquierda = false;
                 }
             }
 
